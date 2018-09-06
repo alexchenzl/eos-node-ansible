@@ -1,0 +1,97 @@
+---
+   - name: Check catalog
+     stat: path={{eos_source_dir}}
+     register: eos_catalog_stat
+     tags: installEos
+
+   - name: Make dir eos-sources
+     file: path={{eos_source_dir}} owner=eosuser group=eosuser mode=0775
+           state=directory
+     when: eos_catalog_stat.stat.exists != true
+     become; true
+     tags: installEos
+
+   - name: Git clone EOS
+     git:
+       repo: '{{eos_git_repo}}'
+       dest: "{{eos_source_dir}}"
+     tags: installEos
+
+   - name: git checkout and update submodules
+     shell: "cd {{eos_source_dir}}/ && git checkout mainnet-{{mainnet_version}} && git submodule update --init --recursive"
+     tags: installEos
+
+   - name: Compile eos
+     expect:
+       command: "{{eos_source_dir}}/./eosio_build.sh -s EOS"
+       responses:
+         '#?': '1'
+         '\[sudo\] password for eosuser:': '{{sudopass}}'
+     tags: installEos
+
+   - name: Check Eos datadir
+     stat: path={{eos_dir}}
+     register: eos_dir_stat
+     tags: installEos
+
+   - name: Make dir of eos data
+     file: path={{eos_dir}} owner=eosuser group=eosuser mode=0775
+           state=directory
+     when: eos_dir_stat.stat.exists != true
+     become: true
+     tags: installEos
+
+   - name: Git clone EOS-MainNet
+     git:
+       repo: 'https://github.com/CryptoLions/EOS-MainNet.git'
+       dest: "{{eos_dir}}"
+     tags: installEos 
+
+   - name: Chmod executable files
+     shell: "chmod -R 777 {{eos_dir}}/*.sh"
+     tags: installEos
+
+
+     
+   - name: stop nodeos
+     shell: "{{eos_dir}}/./stop.sh"
+     tags: backupEos
+
+   - pause: seconds=30
+
+   - name: Check if directory exist
+     shell: "ls {{backup_dir}} | grep $(date +%y%m%d)-backup-eos | wc -l"
+     register: catalog_stat
+     tags: backupEos
+
+   - name: Remove directory if exist
+     shell: "rm -rf {{backup_dir}}/$(date +%y%m%d)-backup-eos"
+     when:
+       - remote_copy == "0"
+       - catalog_stat.stdout == "1"
+     tags: backupEos
+
+   - name: backup nodeos
+#     shell: "tar -C {{eosdir}}nodeos -zvf {{backupdir}}/$(date +%y%m%d)-backup-nodeos.tar.gz"
+     shell: "mkdir {{backup_dir}}/$(date +%y%m%d)-backup-eos && rsync -av {{eos_dir}} {{backup_dir}}/$(date +%y%m%d)-backup-eos"
+     args:
+       chdir: "{{eos_dir}}"
+       warn: false
+     when:
+       - remote_copy == "0"
+       - catalog_stat.stdout == "0"
+     tags: backupEos
+
+   - name: backup nodeos to a remote server
+     shell: "tar czf - {{eos_dir}} | ssh attic@{{ipnode}} 'cd {{remote_backup_dir}} && tar xvzf -'"
+     args:
+       chdir: "{{eos_dir}}"
+       warn: false
+     when:
+       - remote_copy == "1"
+     tags: backupEos
+
+   - name: start nodeos
+     shell: "nohup {{eos_dir}}/./start.sh </dev/null >/dev/null 2>&1 &"
+     tags: backupEos
+
