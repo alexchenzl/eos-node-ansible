@@ -3,4 +3,4 @@ hosts.bak
 cluster.hosts
 templates/
 logs/
-*/vars/
+vars/

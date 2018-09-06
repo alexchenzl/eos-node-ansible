@@ -8,7 +8,7 @@
      file: path={{eos_source_dir}} owner=eosuser group=eosuser mode=0775
            state=directory
      when: eos_catalog_stat.stat.exists != true
-     become; true
+     become: true
      tags: installEos
 
    - name: Git clone EOS
