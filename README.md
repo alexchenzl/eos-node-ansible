@@ -9,7 +9,7 @@ ansible-playbook -i hosts  ./eosnode.yml  --tags backupEos
 
 - EXAMPLE main.yml in vars
 
-mainnet_version: 1.2.3
+mainnet_version: 1.2.3  
 eos_git_repo: "https://github.com/EOS-Mainnet/eos.git"  
 eos_source_dir: /home/eos-sources  
 eosdir: /opt/EOSmainNet - datadir EOS  
