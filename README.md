@@ -19,5 +19,5 @@ ipnode: "182.66.11.11" IP address of backup server
 remote_copy: "1"  
 sudopass: "password" 
 
-- Use compilation log on host which to install EOS
+- Use compilation log on host which to install EOS  
 tail -f /home/eos-sources/install.log.txt   
