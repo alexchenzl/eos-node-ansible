@@ -1,11 +1,19 @@
 ---
+   - name: Install cmake
+     apt: pkg={{ item }} state=latest
+     with_items:
+       - cmake
+       - git
+     become: true
+     tags: installEos
+
    - name: Check catalog
      stat: path={{eos_source_dir}}
      register: eos_catalog_stat
      tags: installEos
 
    - name: Make dir eos-sources
-     file: path={{eos_source_dir}} owner=eosuser group=eosuser mode=0775
+     file: path={{eos_source_dir}} owner=eosuser group=eosuser mode=0777
            state=directory
      when: eos_catalog_stat.stat.exists != true
      become: true
@@ -18,12 +26,12 @@
      tags: installEos
 
    - name: git checkout and update submodules
-     shell: "cd {{eos_source_dir}}/ && git checkout {{mainnet_version}} && git submodule update --init --recursive"
+     shell: "cd {{eos_source_dir}}/ && git checkout {{branch}} && git submodule update --init --recursive"
      tags: installEos
 
    - name: Compile eos
      expect:
-       command: "{{eos_source_dir}}/./eosio_build.sh -s EOS"
+       command: /bin/bash -c "{{eos_source_dir}}/./eosio_build.sh -s EOS 2>&1> {{eos_source_dir}}/install.log.txt"
        responses:
          '#?': '1'
          '\[sudo\] password for eosuser:': '{{sudopass}}'
