@@ -1,4 +1,4 @@
-#EOS NODE
+#EOS NODE ANSIBLE  
 - INSTALL EOS NODE:
 
 ansible-playbook -i hosts  ./eosnode.yml  --tags installEos

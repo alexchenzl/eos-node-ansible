@@ -35,6 +35,7 @@
        responses:
          '#?': '1'
          '\[sudo\] password for eosuser:': '{{sudopass}}'
+     chdir: "{{eos_source_dir}}"
      tags: installEos
 
    - name: Check Eos datadir
