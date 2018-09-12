@@ -77,24 +77,24 @@
    - name: Check Eos datadir 
      stat: path={{eos_dir}}
      register: eos_dir_stat
-     tags: installEos
+     tags: installEosRunner
 
    - name: Make dir of eos data
      file: path={{eos_dir}} owner=eosuser group=eosuser mode=0775
            state=directory
      when: eos_dir_stat.stat.exists != true
      become: true
-     tags: installEos
+     tags: installEosRunner
 
    - name: Git clone EOS-MainNet
      git:
        repo: 'https://github.com/CryptoLions/EOS-MainNet.git'
        dest: "{{eos_dir}}"
-     tags: installEos 
+     tags: installEosRunner 
 
    - name: Chmod executable files
      shell: "chmod -R 777 {{eos_dir}}/*.sh"
-     tags: installEos
+     tags: installEosRunner
 
      
    - name: stop nodeos

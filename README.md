@@ -10,6 +10,13 @@ or
 ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags installEos  
 for a single host  
 
+- INSTALL EOS RUN/STOP SCRIPTS AND MAKE DATADIR:
+
+ansible-playbook -i hosts  ./eosnode.yml  --tags installEosRunner  
+or  
+ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags installEosRunner  
+for a single host  
+
 - BACKUP EOS NODE:  
 
 ansible-playbook -i hosts  ./eosnode.yml  --tags backupEos  
