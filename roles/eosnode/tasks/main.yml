@@ -1,44 +1,80 @@
 ---
-   - name: Install cmake
+   - name: Install the required packages
      apt: pkg={{ item }} state=latest
      with_items:
+       - clang-4.0
+       - lldb-4.0
+       - libclang-4.0-dev
        - cmake
+       - make
+       - automake
+       - libbz2-dev
+       - libssl-dev
+       - libgmp3-dev
+       - autotools-dev
+       - build-essential
+       - libicu-dev
+       - python2.7-dev
+       - python3-dev
+       - autoconf
+       - libtool
+       - curl
+       - zlib1g-dev
+       - doxygen
+       - graphviz
        - git
+       - expect
      become: true
      tags: installEos
 
-   - name: Check catalog
+   - name: Check catalog /home/eos-source
      stat: path={{eos_source_dir}}
      register: eos_catalog_stat
      tags: installEos
 
-   - name: Make dir eos-sources
+   - name: Make dir /home/eos-sources
      file: path={{eos_source_dir}} owner=eosuser group=eosuser mode=0777
            state=directory
      when: eos_catalog_stat.stat.exists != true
      become: true
      tags: installEos
 
-   - name: Git clone EOS
+   - name: Git clone EOS repo
      git:
        repo: '{{eos_git_repo}}'
        dest: "{{eos_source_dir}}"
      tags: installEos
 
-   - name: git checkout and update submodules
+   - name: Git checkout and update submodules
      shell: "cd {{eos_source_dir}}/ && git checkout {{branch}} && git submodule update --init --recursive"
      tags: installEos
 
-   - name: Compile eos
-     expect:
-       command: /bin/bash -c "{{eos_source_dir}}/./eosio_build.sh -s EOS 2>&1> {{eos_source_dir}}/install.log.txt"
-       responses:
-         '#?': '1'
-         '\[sudo\] password for eosuser:': '{{sudopass}}'
-     chdir: "{{eos_source_dir}}"
+#   - name: Compile eos (pexpect does not work correctly!!!)
+#     expect:
+#       command: /bin/bash -c "{{eos_source_dir}}/./eosio_build.sh -s EOS 2>&1> {{eos_source_dir}}/install.log.txt"
+#       responses:
+#         '#?': '1'
+#         '\[sudo\] password for eosuser:': '{{sudopass}}'
+#     chdir: "{{eos_source_dir}}"
+#     tags: installEos
+
+   - name: Compile EOS using shell module
+     shell: |
+       set timeout -1
+       spawn /bin/bash -c "{{eos_source_dir}}/./eosio_build.sh -s EOS 2>&1> {{eos_source_dir}}/install.log.txt"
+
+       expect '#?'
+       send '1\n'
+
+       expect '\[sudo\] password for eosuser:'
+       send '{{sudopass}}\n'
+     args:
+       executable: /usr/bin/expect
+       chdir: "{{eos_source_dir}}"
      tags: installEos
 
-   - name: Check Eos datadir
+
+   - name: Check Eos datadir 
      stat: path={{eos_dir}}
      register: eos_dir_stat
      tags: installEos
@@ -60,7 +96,6 @@
      shell: "chmod -R 777 {{eos_dir}}/*.sh"
      tags: installEos
 
-
      
    - name: stop nodeos
      shell: "{{eos_dir}}/./stop.sh"
@@ -81,7 +116,6 @@
      tags: backupEos
 
    - name: backup nodeos
-#     shell: "tar -C {{eosdir}}nodeos -zvf {{backupdir}}/$(date +%y%m%d)-backup-nodeos.tar.gz"
      shell: "mkdir {{backup_dir}}/$(date +%y%m%d)-backup-eos && rsync -av {{eos_dir}} {{backup_dir}}/$(date +%y%m%d)-backup-eos"
      args:
        chdir: "{{eos_dir}}"

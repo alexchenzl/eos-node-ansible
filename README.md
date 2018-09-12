@@ -1,11 +1,21 @@
 #EOS NODE ANSIBLE  
+- PREPARE FOR INSTALLATION USING ANSIBLE  
+
+For normal operation of the ansible, you must add id_rsa.pub key to authorized_keys on host and add lines "User_Alias  ADMINS = eosuser" and "ADMINS  ALL = NOPASSWD: ALL" to file /etc/sudoers  
+
 - INSTALL EOS NODE:
 
-ansible-playbook -i hosts  ./eosnode.yml  --tags installEos
+ansible-playbook -i hosts  ./eosnode.yml  --tags installEos  
+or  
+ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags installEos  
+for a single host  
 
 - BACKUP EOS NODE:  
 
-ansible-playbook -i hosts  ./eosnode.yml  --tags backupEos
+ansible-playbook -i hosts  ./eosnode.yml  --tags backupEos  
+or  
+ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags backupEos  
+for a single host  
 
 - EXAMPLE main.yml in vars directory
 
