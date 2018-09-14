@@ -32,8 +32,7 @@ config.ini.j2 file is a config.ini file containing the following lines:
     filter-on = *{{ newline }}{{ newline }}  
 {% elif nodes_type == 'seed' %}  
     #filter-on = {{ newline }}{{ newline }}  
-{% endif %}  
-{% endif %}  
+{% endif %}   
 finally enter the following command  
 ansible-playbook -i hosts  ./eosnode.yml  --tags configEos  
 or  
