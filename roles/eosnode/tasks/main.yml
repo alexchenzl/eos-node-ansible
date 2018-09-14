@@ -96,6 +96,20 @@
      shell: "chmod -R 777 {{eos_dir}}/*.sh"
      tags: installEosRunner
 
+   - name: Check Eos config.ini
+     stat: path={{eos_dir}}/config.ini
+     register: eos_conf_stat
+     tags: configEos
+
+   - name: Delete old config.ini
+     file: path={{eos_dir}}/config.ini
+           state=absent
+     when: eos_conf_stat.stat.exists == true
+     tags: configEos
+
+   - name: Create Eos config.ini
+     template: src=config.ini.j2 dest={{eos_dir}}/config.ini owner=eosuser group=eosuser
+     tags: configEos
      
    - name: stop nodeos
      shell: "{{eos_dir}}/./stop.sh"
