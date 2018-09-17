@@ -17,6 +17,46 @@ or
 ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags installEosRunner  
 for a single host  
 
+Contents of stop.sh.j2 file  
+#!/bin/bash  
+
+DIR="{{ eos_dir }}"  
+
+
+ if [ -f $DIR"/nodeos.pid" ]; then  
+        pid=`cat $DIR"/nodeos.pid"`  
+        echo $pid  
+        kill $pid  
+        rm -r $DIR"/nodeos.pid"  
+
+        echo -ne "Stoping Nodeos"  
+
+        while true; do  
+            [ ! -d "/proc/$pid/fd" ] && break  
+            echo -ne "."  
+            sleep 1  
+        done  
+        echo -ne "\rNodeos Stopped.    \n"  
+    fi  
+
+Contents of start.sh.j2 file  
+
+#!/bin/bash  
+
+DATADIR="{{ eos_dir }}"  
+NODEOSBINDIR="{{ nodeos_bin_dir }}"  
+
+
+$DATADIR/stop.sh  
+echo -e "Starting Nodeos \n";  
+
+ulimit -c unlimited  
+ulimit -n 65535  
+ulimit -s 64000  
+
+$NODEOSBINDIR/nodeos/nodeos --data-dir $DATADIR --config-dir $DATADIR "$@" > $DATADIR/stdout.txt 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid  
+ 
+
 - BACKUP EOS NODE:  
 
 ansible-playbook -i hosts  ./eosnode.yml  --tags backupEos  
