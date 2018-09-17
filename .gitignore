@@ -2,4 +2,4 @@ hosts
 hosts.bak
 cluster.hosts
 logs/
-vars/
+vars/main.yml

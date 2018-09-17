@@ -1,0 +1,14 @@
+---
+   branch: mainnet-1.2.3
+   eos_git_repo: "https://github.com/EOS-Mainnet/eos.git"
+   eos_source_dir: /home/eos-sources
+   eos_dir: /opt/EOSmainNet
+   nodeos_bin_dir: /home/eos-sources/build/programs
+   backup_dir: /mnt/operational
+   remote_backup_dir: /home/attic/backuppromoteos
+   ipnode: "1.1.1.1"
+   remote_copy: "1"
+   sudopass: "password"
+   nodes_type: "seed"
+   newline: "\n"
+
