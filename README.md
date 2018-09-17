@@ -1,8 +1,6 @@
 #EOS NODE ANSIBLE  
 - PREPARE FOR INSTALLATION USING ANSIBLE  
 
-For normal operation of the ansible, you must add id_rsa.pub key to authorized_keys on host and add lines "User_Alias  ADMINS = eosuser" and "ADMINS  ALL = NOPASSWD: ALL" to file /etc/sudoers  
-
 - INSTALL EOS NODE:
 
 ansible-playbook -i hosts  ./eosnode.yml  --tags installEos  
@@ -15,47 +13,7 @@ for a single host
 ansible-playbook -i hosts  ./eosnode.yml  --tags installEosRunner  
 or  
 ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags installEosRunner  
-for a single host  
-
-Contents of roles/eosnode/templates/stop.sh.j2 file  
-#!/bin/bash  
-
-DIR="{{ eos_dir }}"  
-
-
- if [ -f $DIR"/nodeos.pid" ]; then  
-        pid=`cat $DIR"/nodeos.pid"`  
-        echo $pid  
-        kill $pid  
-        rm -r $DIR"/nodeos.pid"  
-
-        echo -ne "Stoping Nodeos"  
-
-        while true; do  
-            [ ! -d "/proc/$pid/fd" ] && break  
-            echo -ne "."  
-            sleep 1  
-        done  
-        echo -ne "\rNodeos Stopped.    \n"  
-    fi  
-
-Contents of roles/eosnode/templates/start.sh.j2 file  
-
-#!/bin/bash  
-
-DATADIR="{{ eos_dir }}"  
-NODEOSBINDIR="{{ nodeos_bin_dir }}"  
-
-
-$DATADIR/stop.sh  
-echo -e "Starting Nodeos \n";  
-
-ulimit -c unlimited  
-ulimit -n 65535  
-ulimit -s 64000  
-
-$NODEOSBINDIR/nodeos/nodeos --data-dir $DATADIR --config-dir $DATADIR "$@" > $DATADIR/stdout.txt 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid  
- 
+for a single host   
 
 - BACKUP EOS NODE:  
 
@@ -66,15 +24,6 @@ for a single host
 
 - CONFIGURE EOS NODE
 
-To configure Eos node you must create "templates" directory in the "eosnode" directory and create config.ini.j2 file in it.  
-roles/eosnode/templates/config.ini.j2 file is a config.ini file containing the following lines:   
-p2p-server-address = {{ inventory_hostname }}:9876   
-{% if nodes_type == 'full' %}  
-    filter-on = *{{ newline }}{{ newline }}  
-{% elif nodes_type == 'seed' %}  
-    #filter-on = {{ newline }}{{ newline }}  
-{% endif %}   
-finally enter the following command  
 ansible-playbook -i hosts  ./eosnode.yml  --tags configEos  
 or  
 ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags configEos  
