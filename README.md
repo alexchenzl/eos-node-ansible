@@ -27,7 +27,8 @@ for a single host
 - CONFIGURE EOS NODE
 
 To configure Eos node you must create "templates" directory in the "eosnode" directory and create config.ini.j2 file in it.  
-config.ini.j2 file is a config.ini file containing the following lines:    
+config.ini.j2 file is a config.ini file containing the following lines:   
+p2p-server-address = {{ inventory_hostname }}:9876   
 {% if nodes_type == 'full' %}  
     filter-on = *{{ newline }}{{ newline }}  
 {% elif nodes_type == 'seed' %}  
@@ -44,7 +45,8 @@ for a single host
 branch: master  
 eos_git_repo: "https://github.com/EOSIO/eos.git"  
 eos_source_dir: /home/eos-sources   -  directory with source code  
-eosdir: /opt/EOSmainNet    - datadir EOS  
+eos_dir: /opt/EOSmainNet    - datadir EOS  
+nodeos_bin_dir: /home/eos-sources/build/programs  -  dir of binary files nodeos  
 backup_dir: /Path/to/local/backup/dir  
 remote_backup_dir: Path/to/remote/dir/on/backup/server  
 ipnode: "182.66.11.11" IP address of backup server  

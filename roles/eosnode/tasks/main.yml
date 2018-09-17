@@ -92,6 +92,36 @@
        dest: "{{eos_dir}}"
      tags: installEosRunner 
 
+   - name: Check Eos stop.sh
+     stat: path={{eos_dir}}/stop.sh
+     register: eos_stop_stat
+     tags: installEosRunner
+
+   - name: Delete old stop.sh
+     file: path={{eos_dir}}/stop.sh
+           state=absent
+     when: eos_stop_stat.stat.exists == true
+     tags: installEosRunner
+
+   - name: Create Eos stop.sh
+     template: src=stop.sh.j2 dest={{eos_dir}}/stop.sh owner=eosuser group=eosuser
+     tags: installEosRunner
+
+   - name: Check Eos start.sh
+     stat: path={{eos_dir}}/start.sh
+     register: eos_start_stat
+     tags: installEosRunner
+
+   - name: Delete old start.sh
+     file: path={{eos_dir}}/start.sh
+           state=absent
+     when: eos_start_stat.stat.exists == true
+     tags: installEosRunner
+
+   - name: Create Eos start.sh
+     template: src=start.sh.j2 dest={{eos_dir}}/start.sh owner=eosuser group=eosuser
+     tags: installEosRunner
+
    - name: Chmod executable files
      shell: "chmod -R 777 {{eos_dir}}/*.sh"
      tags: installEosRunner
