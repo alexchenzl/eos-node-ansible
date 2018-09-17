@@ -17,7 +17,7 @@ or
 ansible-playbook -i hosts -l 192.168.1.12 ./eosnode.yml  --tags installEosRunner  
 for a single host  
 
-Contents of stop.sh.j2 file  
+Contents of roles/eosnode/templates/stop.sh.j2 file  
 #!/bin/bash  
 
 DIR="{{ eos_dir }}"  
@@ -39,7 +39,7 @@ DIR="{{ eos_dir }}"
         echo -ne "\rNodeos Stopped.    \n"  
     fi  
 
-Contents of start.sh.j2 file  
+Contents of roles/eosnode/templates/start.sh.j2 file  
 
 #!/bin/bash  
 
@@ -67,7 +67,7 @@ for a single host
 - CONFIGURE EOS NODE
 
 To configure Eos node you must create "templates" directory in the "eosnode" directory and create config.ini.j2 file in it.  
-config.ini.j2 file is a config.ini file containing the following lines:   
+roles/eosnode/templates/config.ini.j2 file is a config.ini file containing the following lines:   
 p2p-server-address = {{ inventory_hostname }}:9876   
 {% if nodes_type == 'full' %}  
     filter-on = *{{ newline }}{{ newline }}  
