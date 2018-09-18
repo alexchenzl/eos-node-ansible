@@ -1,0 +1,12 @@
+#!/bin/bash
+
+NODEOSBINDIR="{{ nodeos_bin_dir }}"
+
+NODEHOST="localhost"
+NODEPORT="8888"
+
+WALLETHOST="127.0.0.1"
+WALLETPORT="3000"
+
+
+$NODEOSBINDIR/cleos/cleos -u http://$NODEHOST:$NODEPORT --wallet-url http://$WALLETHOST:$WALLETPORT "$@"

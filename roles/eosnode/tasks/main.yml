@@ -122,6 +122,21 @@
      template: src=start.sh.j2 dest={{eos_dir}}/start.sh owner=eosuser group=eosuser
      tags: installEosRunner
 
+   - name: Check Eos cleos.sh
+     stat: path={{eos_dir}}/cleos.sh
+     register: eos_cleos_stat
+     tags: installEosRunner
+
+   - name: Delete old cleos.sh
+     file: path={{eos_dir}}/cleos.sh
+           state=absent
+     when: eos_cleos_stat.stat.exists == true
+     tags: installEosRunner
+
+   - name: Create Eos cleos.sh
+     template: src=cleos.sh.j2 dest={{eos_dir}}/cleos.sh owner=eosuser group=eosuser
+     tags: installEosRunner
+
    - name: Chmod executable files
      shell: "chmod -R 777 {{eos_dir}}/*.sh"
      tags: installEosRunner
