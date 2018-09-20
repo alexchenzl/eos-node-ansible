@@ -1,0 +1,17 @@
+#!/bin/sh
+
+DATE=`date "+%a"`
+YEAR=`date "+%Y"`
+MONTH=`date "+%m"`
+DAY=`date "+%d"`
+H=`date "+%H"`
+M=`date "+%M"`
+
+DATA_DIR={{ eos_dir }}
+BACKUP_DIR={{ backup_dir }}/backups/${DATE}
+
+$DATA_DIR/stop.sh
+mkdir $BACKUP_DIR
+cp -rf state/ ${BACKUP_DIR}/ && cp -rf blocks/ ${BACKUP_DIR}/
+$DATA_DIR/start.sh
+

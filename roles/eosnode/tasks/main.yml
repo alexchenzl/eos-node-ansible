@@ -137,6 +137,34 @@
      template: src=cleos.sh.j2 dest={{eos_dir}}/cleos.sh owner=eosuser group=eosuser
      tags: installEosRunner
 
+   - name: Check Eos backup.sh
+     stat: path={{eos_dir}}/backup.sh
+     register: eos_backup_stat
+     tags: installEosRunner
+
+   - name: Delete old backup.sh
+     file: path={{eos_dir}}/backup.sh
+           state=absent
+     when: eos_backup_stat.stat.exists == true
+     tags: installEosRunner
+
+   - name: Check Eos backups dir
+     stat: path={{backup_dir}}/backups
+     register: eos_backups_stat
+     tags: installEosRunner
+
+   - name: Make dir backups
+     file:
+       path: "{{backup_dir}}/backups"
+       state: directory
+       mode: 0755
+     when: eos_backup_stat.stat.exists != true
+     tags: installEosRunner
+
+   - name: Create Eos backup.sh
+     template: src=backup.sh.j2 dest={{eos_dir}}/backup.sh owner=eosuser group=eosuser
+     tags: installEosRunner
+
    - name: Chmod executable files
      shell: "chmod -R 777 {{eos_dir}}/*.sh"
      tags: installEosRunner
