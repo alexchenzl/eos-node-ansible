@@ -73,6 +73,10 @@
        chdir: "{{eos_source_dir}}"
      tags: installEos
 
+   - name: Add non root port binding
+     shell: "setcap cap_net_bind_service=+ep {{nodeos_bin_dir}}/nodeos/nodeos"
+     become: true
+     tags: installEos
 
    - name: Check Eos datadir 
      stat: path={{eos_dir}}
